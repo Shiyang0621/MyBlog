@@ -36,4 +36,10 @@ class PostController extends Controller
     }
     return redirect()->route('posts.index');
   }
+
+  public function new_post(){
+    return view('posts.new_post');
+  }
+
+
 }
