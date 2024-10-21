@@ -22,5 +22,8 @@
             @include('layout.footer')
         </footer>
 
+        @yield('scripts')
+
+
     </body>
 </html>
