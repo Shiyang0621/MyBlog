@@ -10,8 +10,57 @@ class PostController extends Controller
 {
 
   public function index(){
-    return view('posts.index');
+
+    // $posts = Post::all();
+    $posts = Post::with('image')->get();
+    return view('posts.index', compact('posts'));
   }
+
+  public function show($id){
+    $post = Post::with('image')->findOrFail($id);
+    return view('posts.show',compact('post'));
+  }
+  
+  public function edit($id){
+    $post = Post::with('image')->findOrFail($id);
+    return view('posts.edit',compact('post'));
+  }
+
+  public function update(Request $request, $id){
+    $request->validate([
+        'title' => 'required',
+        'content'=>'required',
+        'image.*'=> 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+    ]);
+
+    $post = Post::findOrFail($id);
+    $post->update([
+      'title' => $request->title,
+      'content' => $request->content,
+    ]);
+
+    if ($request->hasFile('image')) {
+      foreach ($request->file('image') as $imageFile) {
+          $imageName = time() . '_' . $imageFile->getClientOriginalName();
+          $imagePath = public_path('images');
+          $imageFile->move($imagePath, $imageName);
+          Image::create([
+              'image' => 'images/' . $imageName,
+              'post_id' => $post->id
+          ]);
+        }
+    }
+
+    $post->update($request->all());
+    return redirect()->route('posts.show', $post->id);
+  }
+
+  public function delete($id){
+    $post = Post::with('image')->findOrFail($id);
+    $post->delete();
+    return redirect()->route('posts.index');
+  }
+
 
 
   public function store(Request $request) {

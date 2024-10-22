@@ -1,9 +1,31 @@
 @extends('layout.app')
-@section('title', 'Task List')
+@section('title', 'The Post')
 @section('content')
 
 <div>
-        <h1>Test</h1>
+        <h2>My Post</h2>
+        @if($posts->isEmpty())
+                <p>No Posts available</p>
+        @else
+        <div class="card">
+                @foreach($posts as $post)
+                        <section class="card-body">
+                                <h2 class='card-title'>{{$post->title}}</h2>
+                                <p class="card-text">{{Str::limit($post->content, 100)}}</p>
+                                @if($post->image)
+                                        @foreach($post->image as $image)
+                                        <figure class='card-img-top'>
+                                                <img src="{{$image->image}}" alt="Post Image" style="width:50%;">
+                                        </figure>
+                                        @endforeach
+                                @endif
+                                <a href="{{route('posts.show', $post->id)}}">Read More</a>
+                                <a href="{{route('posts.edit', $post->id)}}">Edit Post</a>
+                                <a href="{{route('posts.delete', $post->id)}}">Delete Post</a>
+                        </section>
+                @endforeach
+        </div>
+        @endif
 </div>
 
 @endsection
