@@ -39,20 +39,35 @@ class PostController extends Controller
       'content' => $request->content,
     ]);
 
-    if ($request->hasFile('image')) {
-      foreach ($request->file('image') as $imageFile) {
+
+    if($request->has('remove_image')){
+      foreach($request->remove_image as $imageId){
+        $Image = Image::find($imageId);
+        if($Image){
+          $Image->delete();
+        }
+      }
+    }
+
+
+    if ($request->hasFile('images')) {
+      foreach ($request->file('images') as $imageFile) {
+          // 调试信息，检查是否多个文件上传成功
+
+  
           $imageName = time() . '_' . $imageFile->getClientOriginalName();
           $imagePath = public_path('images');
           $imageFile->move($imagePath, $imageName);
+  
           Image::create([
               'image' => 'images/' . $imageName,
               'post_id' => $post->id
           ]);
-        }
+      }
     }
 
     $post->update($request->all());
-    return redirect()->route('posts.show', $post->id);
+    return redirect()->route('posts.index', $post->id);
   }
 
   public function delete($id){
